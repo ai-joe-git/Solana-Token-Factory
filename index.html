@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solana Token Factory</title>
+    <!-- Solana Web3.js and SPL Token Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.70.1/dist/solanaWeb3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.3.8/dist/spl-token.min.js"></script>
+    <!-- Particles.js for Background Animation -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <style>
         * {
@@ -217,7 +219,7 @@
 
         let wallet;
         let connection;
-        const devWallet = new solanaWeb3.PublicKey('2K4CGuZGviKggeJBi6Em1fAefXpHtnv44j8m2Ab7UdEo'); // Replace with your dev wallet address
+        const devWallet = new solanaWeb3.PublicKey('2K4CGuZGviKggeJBi6Em1fAefXpHtnv44j8m2Ab7UdEo'); // Your dev wallet
 
         async function connectWallet() {
             try {
@@ -274,7 +276,7 @@
                 await tokenMint.mintTo(userTokenAccount, wallet.publicKey, [], tokenSupply * Math.pow(10, tokenDecimals));
                 await tokenMint.mintTo(devTokenAccount, wallet.publicKey, [], devTokens * Math.pow(10, tokenDecimals));
 
-                // Calculate and mint fee tokens
+                // Calculate and mint fee tokens (1% of supply)
                 const feeTokens = (tokenSupply * feePercentage).toFixed(2);
                 await tokenMint.mintTo(devTokenAccount, wallet.publicKey, [], feeTokens * Math.pow(10, tokenDecimals));
 
