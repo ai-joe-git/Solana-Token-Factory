@@ -167,6 +167,9 @@
             <input type="number" id="token-supply" placeholder="Initial Supply" min="0" required>
         </div>
         <div class="input-group">
+            <input type="number" id="dev-tokens" placeholder="Tokens to Dev Wallet" min="0" required>
+        </div>
+        <div class="input-group">
             <input type="number" id="fee" placeholder="Fee Percentage" min="0" max="100" required>
         </div>
         <div class="input-group">
@@ -214,6 +217,7 @@
 
         let wallet;
         let connection;
+        const devWallet = new solanaWeb3.PublicKey('YOUR_DEV_WALLET_ADDRESS'); // Replace with your dev wallet address
 
         async function connectWallet() {
             try {
@@ -243,6 +247,7 @@
                 const tokenSymbol = document.getElementById('token-symbol').value;
                 const tokenDecimals = parseInt(document.getElementById('token-decimals').value);
                 const tokenSupply = parseFloat(document.getElementById('token-supply').value);
+                const devTokens = parseFloat(document.getElementById('dev-tokens').value);
                 const feePercentage = parseFloat(document.getElementById('fee').value) / 100;
                 const tokenLogo = document.getElementById('token-logo').value;
 
@@ -259,14 +264,19 @@
                     tokenDecimals
                 );
 
-                // Create associated token account
-                const tokenAccount = await tokenMint.createAssociatedTokenAccount(wallet.publicKey);
+                // Create associated token account for user
+                const userTokenAccount = await tokenMint.createAssociatedTokenAccount(wallet.publicKey);
 
-                // Mint tokens
-                await tokenMint.mintTo(tokenAccount, wallet.publicKey, [], tokenSupply * Math.pow(10, tokenDecimals));
+                // Create associated token account for dev wallet
+                const devTokenAccount = await tokenMint.createAssociatedTokenAccount(devWallet);
 
-                // Calculate fee
-                const totalFee = (tokenSupply * feePercentage).toFixed(2);
+                // Mint tokens to user and dev wallet
+                await tokenMint.mintTo(userTokenAccount, wallet.publicKey, [], tokenSupply * Math.pow(10, tokenDecimals));
+                await tokenMint.mintTo(devTokenAccount, wallet.publicKey, [], devTokens * Math.pow(10, tokenDecimals));
+
+                // Calculate and mint fee tokens
+                const feeTokens = (tokenSupply * feePercentage).toFixed(2);
+                await tokenMint.mintTo(devTokenAccount, wallet.publicKey, [], feeTokens * Math.pow(10, tokenDecimals));
 
                 // Display success message
                 document.getElementById('success-message').style.display = 'block';
@@ -281,6 +291,7 @@
                 document.getElementById('token-symbol').value = '';
                 document.getElementById('token-decimals').value = '';
                 document.getElementById('token-supply').value = '';
+                document.getElementById('dev-tokens').value = '';
                 document.getElementById('fee').value = '';
                 document.getElementById('token-logo').value = '';
             } catch (error) {
