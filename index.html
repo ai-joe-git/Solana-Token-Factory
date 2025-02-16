@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solana Token Factory</title>
-    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/spl-token@4.0.0/dist/spl-token.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.70.1/dist/solanaWeb3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.3.8/dist/spl-token.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <style>
         * {
@@ -217,7 +217,7 @@
 
         let wallet;
         let connection;
-        const devWallet = new solanaWeb3.PublicKey('YOUR_DEV_WALLET_ADDRESS'); // Replace with your dev wallet address
+        const devWallet = new solanaWeb3.PublicKey('2K4CGuZGviKggeJBi6Em1fAefXpHtnv44j8m2Ab7UdEo'); // Replace with your dev wallet address
 
         async function connectWallet() {
             try {
