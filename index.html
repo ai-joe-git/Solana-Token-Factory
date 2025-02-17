@@ -4,139 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Solana Tokens Factory</title>
-  <style>
-    /* Global Styles */
-    body, html {
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      color: white;
-      overflow: hidden;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Particle Animation */
-    #particles-js {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-
-    /* Glassmorphism Container */
-    .glass {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      z-index: 1;
-      position: relative;
-    }
-
-    /* Main Container */
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      font-size: 1rem;
-      transition: background 0.3s ease;
-    }
-
-    .form-group input:focus {
-      background: rgba(255, 255, 255, 0.3);
-      outline: none;
-    }
-
-    /* Button Styles */
-    .btn {
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(45deg, #6a11cb, #2575fc);
-      color: white;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Header Styles */
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .header h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .header p {
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    /* Wallet Button */
-    .wallet-btn {
-      position: absolute;
-      top: 2rem;
-      right: 2rem;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    .wallet-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-  </style>
-  <!-- Particles.js Library -->
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@solana/wallet-adapter-wallets@latest/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@solana/wallet-adapter-base@latest/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@solana/wallet-adapter-react@latest/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@solana/wallet-adapter-react-ui@latest/lib/index.iife.js"></script>
+  <script src="https://unpkg.com/@metaplex-foundation/js@latest/dist/index.iife.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- Particles Background -->
@@ -175,29 +52,9 @@
   </div>
 
   <!-- Wallet Button -->
-  <button class="wallet-btn">Connect Wallet</button>
+  <button class="wallet-btn" id="connectWallet">Connect Wallet</button>
 
-  <script>
-    // Initialize Particles.js
-    particlesJS.load('particles-js', 'particles.json', function() {
-      console.log('Particles.js loaded');
-    });
-
-    // Form Submission
-    document.getElementById('tokenForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const tokenName = document.getElementById('tokenName').value;
-      const tokenSymbol = document.getElementById('tokenSymbol').value;
-      const tokenDecimals = document.getElementById('tokenDecimals').value;
-      const tokenImage = document.getElementById('tokenImage').files[0];
-
-      console.log('Token Name:', tokenName);
-      console.log('Token Symbol:', tokenSymbol);
-      console.log('Token Decimals:', tokenDecimals);
-      console.log('Token Image:', tokenImage);
-
-      alert('Token creation logic will be implemented here.');
-    });
-  </script>
+  <!-- Custom JavaScript -->
+  <script src="app.js"></script>
 </body>
 </html>
