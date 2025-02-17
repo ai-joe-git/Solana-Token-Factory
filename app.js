@@ -75,44 +75,6 @@ const createToken = async (name, symbol, decimals, image) => {
   return mint.publicKey;
 };
 
-// Bonding Curve Logic
-const k = 0.01; // Bonding curve constant
-
-const calculatePrice = (supply) => {
-  return k * supply;
-};
-
-const buyTokens = async (mint, amount) => {
-  const supply = await getTokenSupply(mint);
-  const price = calculatePrice(supply + amount);
-  console.log('Price to buy:', price);
-  // Transfer SOL from user to your DApp's wallet
-};
-
-const sellTokens = async (mint, amount) => {
-  const supply = await getTokenSupply(mint);
-  const price = calculatePrice(supply - amount);
-  console.log('Price to sell:', price);
-  // Transfer SOL from your DApp's wallet to the user
-};
-
-const getTokenSupply = async (mint) => {
-  const mintInfo = await connection.getTokenSupply(mint);
-  return mintInfo.value.amount;
-};
-
-// Raydium Integration
-const listOnRaydium = async (mint) => {
-  const raydium = new Raydium(connection, wallet);
-  const pool = await raydium.createPool({
-    tokenMint: mint,
-    baseMint: solanaWeb3.NATIVE_MINT, // SOL
-    baseAmount: 1000000000, // 1 SOL
-    tokenAmount: 1000000000, // 1,000,000,000 tokens
-  });
-  console.log('Pool created:', pool);
-};
-
 // Form Submission
 document.getElementById('tokenForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -124,8 +86,4 @@ document.getElementById('tokenForm').addEventListener('submit', async (e) => {
   // Create Token
   const mint = await createToken(tokenName, tokenSymbol, tokenDecimals, tokenImage);
   alert('Token created successfully! Mint Address: ' + mint.toString());
-
-  // List Token on Raydium
-  await listOnRaydium(mint);
-  alert('Token listed on Raydium!');
 });
