@@ -1,415 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Token Factory</title>
-    <!-- Load Solana Web3.js -->
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-    <!-- Load SPL Token library -->
-    <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.3.8/lib/index.iife.js"></script>
-    <!-- Load Particles.js -->
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solana Tokens Factory</title>
+  <style>
+    /* Global Styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: white;
+      overflow: hidden;
+    }
 
-        body {
-            background: linear-gradient(45deg, #00f3ff, #9d00ff);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-        .container {
-            position: relative;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
-            transition: all 0.3s ease;
-            width: 90%;
-            max-width: 500px;
-            z-index: 1;
-        }
+    /* Particle Animation */
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
 
-        .container:hover {
-            transform: translateY(-10px);
-        }
+    /* Glassmorphism Container */
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      z-index: 1;
+      position: relative;
+    }
 
-        h1 {
-            color: #fff;
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-        }
+    /* Main Container */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
 
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
 
-        input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid rgba(0, 243, 255, 0.5);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transition: all 0.3s ease;
-        }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
 
-        input:focus {
-            outline: none;
-            border-color: #00f3ff;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-        }
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
 
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
+    .form-group input:focus {
+      background: rgba(255, 255, 255, 0.3);
+      outline: none;
+    }
 
-        button {
-            width: 100%;
-            padding: 1rem;
-            background: transparent;
-            border: 2px solid rgba(0, 243, 255, 0.5);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-        }
+    /* Button Styles */
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #6a11cb, #2575fc);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
 
-        button:hover:not(:disabled) {
-            background: rgba(0, 243, 255, 0.2);
-            transform: translateY(-2px);
-        }
+    /* Header Styles */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
 
-        .success-message {
-            display: none;
-            text-align: center;
-            color: #00f3ff;
-            font-size: 1.2rem;
-            margin-top: 1rem;
-            animation: fadeIn 1s ease;
-        }
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
 
-        .error-message {
-            display: none;
-            text-align: center;
-            color: #ff0055;
-            font-size: 1.2rem;
-            margin-top: 1rem;
-            animation: fadeIn 1s ease;
-            background: rgba(255, 0, 85, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-        }
+    .header p {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Wallet Button */
+    .wallet-btn {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-        #particles-js {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        .wallet-info {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 1.5rem;
-            word-break: break-all;
-            padding: 0 1rem;
-        }
-
-        .wallet-info span {
-            font-weight: bold;
-            color: #00f3ff;
-        }
-
-        .network-status {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            color: #00f3ff;
-            background: rgba(0, 243, 255, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 1.5rem;
-            height: 1.5rem;
-            border: 3px solid #00f3ff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .transaction-link {
-            display: inline-block;
-            color: #00f3ff;
-            text-decoration: none;
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            border: 1px solid #00f3ff;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .transaction-link:hover {
-            background: rgba(0, 243, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            input, button {
-                padding: 0.8rem;
-            }
-
-            .network-status {
-                font-size: 0.8rem;
-                padding: 0.3rem 0.8rem;
-            }
-        }
-    </style>
+    .wallet-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+  <!-- Particles.js Library -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
-    <div id="particles-js"></div>
-    <div class="container">
-        <div class="network-status">Mainnet</div>
-        <h1>Create Your Token</h1>
-        <div class="wallet-info">
-            Wallet: <span id="wallet-address">Not Connected</span>
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="glass" style="width: 400px;">
+      <!-- Header -->
+      <div class="header">
+        <h1>Solana Tokens Factory</h1>
+        <p>Create your own token in minutes.</p>
+      </div>
+
+      <!-- Token Creation Form -->
+      <form id="tokenForm">
+        <div class="form-group">
+          <label for="tokenName">Token Name</label>
+          <input type="text" id="tokenName" placeholder="Enter token name" required>
         </div>
-        <div class="input-group">
-            <input type="text" id="token-name" placeholder="Token Name" required>
+        <div class="form-group">
+          <label for="tokenSymbol">Token Symbol</label>
+          <input type="text" id="tokenSymbol" placeholder="Enter token symbol" required>
         </div>
-        <div class="input-group">
-            <input type="text" id="token-symbol" placeholder="Token Symbol" required>
+        <div class="form-group">
+          <label for="tokenDecimals">Token Decimals</label>
+          <input type="number" id="tokenDecimals" placeholder="Enter decimals" value="9" required>
         </div>
-        <div class="input-group">
-            <input type="number" id="token-decimals" placeholder="Token Decimals (0-9)" min="0" max="9" required>
+        <div class="form-group">
+          <label for="tokenImage">Token Image</label>
+          <input type="file" id="tokenImage" accept="image/*" required>
         </div>
-        <div class="input-group">
-            <input type="number" id="token-supply" placeholder="Initial Supply" min="0" required>
-        </div>
-        <div class="input-group">
-            <input type="number" id="dev-tokens" placeholder="Tokens to Dev Wallet" min="0" required>
-        </div>
-        <div class="input-group">
-            <input type="number" id="fee" placeholder="Fee Percentage (0-100)" min="0" max="100" step="0.1" required>
-        </div>
-        <div class="input-group">
-            <input type="url" id="token-logo" placeholder="Token Logo URI (optional)">
-        </div>
-        <button onclick="connectWallet()" id="connect-wallet-btn">Connect Wallet</button>
-        <button onclick="createToken()" id="create-token-btn" disabled>Create Token</button>
-        <div class="loading" id="loading"></div>
-        <div class="success-message" id="success-message">
-            Token created successfully! Fee: <span id="fee-display">0%</span>
-            <a href="#" target="_blank" class="transaction-link" id="transaction-link">View Transaction</a>
-        </div>
-        <div class="error-message" id="error-message">
-            <span id="error-details"></span>
-        </div>
+        <button type="submit" class="btn">Create Token</button>
+      </form>
     </div>
+  </div>
 
-    <script>
-        // Initialize particles
-        particlesJS('particles-js', {
-            particles: {
-                number: { value: 80 },
-                color: { value: '#00f3ff' },
-                opacity: { value: 0.5 },
-                size: { value: 3 },
-                move: {
-                    enable: true,
-                    speed: 2,
-                    direction: 'none',
-                    random: false,
-                    straight: false,
-                    out_mode: 'out',
-                    bounce: false,
-                }
-            },
-            interactivity: {
-                detect_on: 'canvas',
-                events: {
-                    onhover: { enable: true, mode: 'repulse' },
-                    onclick: { enable: true, mode: 'push' },
-                    resize: true
-                }
-            },
-            retina_detect: true
-        });
+  <!-- Wallet Button -->
+  <button class="wallet-btn">Connect Wallet</button>
 
-        let wallet;
-        let connection;
-        const devWallet = new solanaWeb3.PublicKey('2K4CGuZGviKggeJBi6Em1fAefXpHtnv44j8m2Ab7UdEo');
+  <script>
+    // Initialize Particles.js
+    particlesJS.load('particles-js', 'particles.json', function() {
+      console.log('Particles.js loaded');
+    });
 
-        // Initialize on page load
-        window.addEventListener('load', function() {
-            if (typeof solanaWeb3 === 'undefined') {
-                showError('Solana Web3 library failed to load. Please refresh the page.');
-                return;
-            }
-            
-            if (typeof splToken === 'undefined') {
-                showError('SPL Token library failed to load. Please refresh the page.');
-                return;
-            }
-            
-            try {
-                // Use mainnet-beta instead of devnet
-                connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'), 'confirmed');
-            } catch (error) {
-                showError('Failed to initialize Solana connection: ' + error.message);
-            }
-        });
+    // Form Submission
+    document.getElementById('tokenForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const tokenName = document.getElementById('tokenName').value;
+      const tokenSymbol = document.getElementById('tokenSymbol').value;
+      const tokenDecimals = document.getElementById('tokenDecimals').value;
+      const tokenImage = document.getElementById('tokenImage').files[0];
 
-        async function connectWallet() {
-            try {
-                if (!window.solana || !window.solana.isPhantom) {
-                    throw new Error('Please install Phantom wallet');
-                }
+      console.log('Token Name:', tokenName);
+      console.log('Token Symbol:', tokenSymbol);
+      console.log('Token Decimals:', tokenDecimals);
+      console.log('Token Image:', tokenImage);
 
-                wallet = window.solana;
-                const response = await wallet.connect();
-                
-                if (response.publicKey) {
-                    document.getElementById('wallet-address').textContent = response.publicKey.toString();
-                    document.getElementById('connect-wallet-btn').style.display = 'none';
-                    document.getElementById('create-token-btn').disabled = false;
-                }
-            } catch (error) {
-                showError('Wallet connection failed: ' + error.message);
-            }
-        }
-
-        async function createToken() {
-            const loading = document.getElementById('loading');
-            loading.style.display = 'block';
-            document.getElementById('create-token-btn').disabled = true;
-            document.getElementById('error-message').style.display = 'none';
-            document.getElementById('success-message').style.display = 'none';
-
-            try {
-                if (!wallet || !wallet.publicKey) {
-                    throw new Error('Please connect your wallet first');
-                }
-
-                const tokenName = document.getElementById('token-name').value;
-                const tokenSymbol = document.getElementById('token-symbol').value;
-                const tokenDecimals = parseInt(document.getElementById('token-decimals').value);
-                const tokenSupply = parseFloat(document.getElementById('token-supply').value);
-                const devTokens = parseFloat(document.getElementById('dev-tokens').value);
-                const feePercentage = parseFloat(document.getElementById('fee').value) / 100;
-                const tokenLogo = document.getElementById('token-logo').value;
-
-                // Validation
-                if (!tokenName || !tokenSymbol || isNaN(tokenDecimals) || isNaN(tokenSupply) || isNaN(feePercentage)) {
-                    throw new Error('Please fill all required fields correctly');
-                }
-
-                if (tokenDecimals < 0 || tokenDecimals > 9) {
-                    throw new Error('Decimals must be between 0 and 9');
-                }
-
-                if (feePercentage < 0 || feePercentage > 1) {
-                    throw new Error('Fee percentage must be between 0 and 100');
-                }
-
-                // Create token mint
-                const tokenMint = await splToken.Token.createMint(
-                    connection,
-                    wallet,
-                    wallet.publicKey,
-                    null,
-                    tokenDecimals
-                );
-
-                // Create associated token accounts
-                const userTokenAccount = await tokenMint.createAssociatedTokenAccount(wallet.publicKey);
-                const devTokenAccount = await tokenMint.createAssociatedTokenAccount(devWallet);
-
-                // Mint tokens
-                const mintAmount = tokenSupply * Math.pow(10, tokenDecimals);
-                const devAmount = devTokens * Math.pow(10, tokenDecimals);
-                const feeAmount = Math.floor(mintAmount * feePercentage);
-
-                await tokenMint.mintTo(userTokenAccount, wallet.publicKey, [], mintAmount);
-                await tokenMint.mintTo(devTokenAccount, wallet.publicKey, [], devAmount + feeAmount);
-
-                // Success handling
-                document.getElementById('success-message').style.display = 'block';
-                document.getElementById('fee-display').textContent = `${(feePercentage * 100).toFixed(1)}%`;
-                document.getElementById('transaction-link').href = 
-                    `https://explorer.solana.com/address/${tokenMint.publicKey.toString()}`;
-
-                // Reset form
-                document.getElementById('token-name').value = '';
-                document.getElementById('token-symbol').value = '';
-                document.getElementById('token-decimals').value = '';
-                document.getElementById('token-supply').value = '';
-                document.getElementById('dev-tokens').value = '';
-                document.getElementById('fee').value = '';
-                document.getElementById('token-logo').value = '';
-
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                loading.style.display = 'none';
-                document.getElementById('create-token-btn').disabled = false;
-            }
-        }
-
-        function showError(message) {
-            document.getElementById('error-message').style.display = 'block';
-            document.getElementById('error-details').textContent = message;
-        }
-    </script>
+      alert('Token creation logic will be implemented here.');
+    });
+  </script>
 </body>
 </html>
