@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Control Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Glassmorphism Container */
+    .glass-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem;
+      width: 90%;
+      max-width: 1000px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Token Customization Section */
+    .token-customization {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .token-customization input,
+    .token-customization textarea {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .token-customization input::placeholder,
+    .token-customization textarea::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Buttons */
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      margin: 0.5rem;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    /* Progress Bars */
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+
+    .progress-bar div {
+      height: 100%;
+      background: #23d5ab;
+      width: 0;
+      transition: width 0.5s ease;
+    }
+
+    /* Log Output */
+    .log-output {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 2rem;
+      max-height: 200px;
+      overflow-y: auto;
+      text-align: left;
+      font-family: monospace;
+    }
+
+    .log-output p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      margin-top: 2rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      height: 300px; /* Fixed height to prevent layout shifts */
+    }
+
+    /* Prevent Layout Shifts */
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-container">
+    <h1>Bot Control Panel</h1>
+    <p>Manage your Solana bot with ease.</p>
+
+    <!-- Token Customization -->
+    <div class="token-customization">
+      <input type="text" id="tokenName" placeholder="Token Name">
+      <input type="text" id="websiteLink" placeholder="Website Link">
+      <input type="text" id="twitterAccount" placeholder="Twitter Account">
+      <input type="file" id="tokenImage" accept="image/*" style="display: none;">
+      <button class="btn" onclick="document.getElementById('tokenImage').click()">Upload Token Image</button>
+    </div>
+
+    <!-- Buttons for Bot Actions -->
+    <button class="btn" id="generateWallets">Generate Wallets</button>
+    <button class="btn" id="fundWallets">Fund Wallets</button>
+    <button class="btn" id="createToken">Create Token</button>
+    <button class="btn" id="startSwapping">Start Swapping</button>
+    <button class="btn" id="stopSwapping">Stop Swapping</button>
+    <button class="btn" id="sellTokens">Sell Tokens</button>
+    <button class="btn" id="returnSol">Return SOL to Main Wallet</button>
+
+    <!-- Progress Bars -->
+    <div class="progress-bar">
+      <div id="progressGenerateWallets"></div>
+    </div>
+    <div class="progress-bar">
+      <div id="progressFundWallets"></div>
+    </div>
+    <div class="progress-bar">
+      <div id="progressCreateToken"></div>
+    </div>
+
+    <!-- Log Output -->
+    <div class="log-output" id="logOutput">
+      <p>Logs will appear here...</p>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-container">
+      <canvas id="tokenChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Log Function to Display Messages
+    const logOutput = document.getElementById('logOutput');
+    function log(message) {
+      const logEntry = document.createElement('p');
+      logEntry.textContent = `[`${{new Date().toLocaleTimeString()}]}$`{message}`;
+      logOutput.appendChild(logEntry);
+      logOutput.scrollTop = logOutput.scrollHeight; // Auto-scroll to bottom
+    }
+
+    // Progress Bars
+    const progressBars = {
+      generateWallets: document.getElementById('progressGenerateWallets'),
+      fundWallets: document.getElementById('progressFundWallets'),
+      createToken: document.getElementById('progressCreateToken'),
+    };
+
+    function updateProgressBar(bar, progress) {
+      bar.style.width = `${progress}%`;
+    }
+
+    // Chart Initialization
+    const ctx = document.getElementById('tokenChart').getContext('2d');
+    const tokenChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Token Price',
+          data: [],
+          borderColor: '#23d5ab',
+          tension: 0.1,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false, // Prevent chart from resizing
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+
+    // Simulation Variables
+    let tokenPrice = 0;
+    let totalSpent = 0; // Total SOL spent during swapping
+    let totalReturned = 0; // Total SOL returned after selling tokens
+    let swapInterval;
+
+    // Simulate Wallet Generation
+    document.getElementById('generateWallets').addEventListener('click', async () => {
+      console.log('Generate Wallets button clicked');
+      log('Generating 200 wallets...');
+      for (let i = 0; i <= 100; i += 5) {
+        updateProgressBar(progressBars.generateWallets, i);
+        await new Promise(resolve => setTimeout(resolve, 50)); // Faster progress
+      }
+      log('Wallets generated successfully!');
+    });
+
+    // Simulate Funding Wallets
+    document.getElementById('fundWallets').addEventListener('click', async () => {
+      console.log('Fund Wallets button clicked');
+      log('Funding wallets with 0.05 SOL each...');
+      for (let i = 0; i <= 100; i += 5) {
+        updateProgressBar(progressBars.fundWallets, i);
+        await new Promise(resolve => setTimeout(resolve, 50)); // Faster progress
+      }
+      log('Wallets funded successfully!');
+    });
+
+    // Simulate Token Creation
+    document.getElementById('createToken').addEventListener('click', async () => {
+      const tokenName = document.getElementById('tokenName').value;
+      console.log('Create Token button clicked');
+      log(`Creating token "${tokenName}" on pump.fun...`);
+      for (let i = 0; i <= 100; i += 5) {
+        updateProgressBar(progressBars.createToken, i);
+        await new Promise(resolve => setTimeout(resolve, 50)); // Faster progress
+      }
+      log('Token created successfully!');
+      tokenPrice = 0; // Reset price to zero
+      totalSpent = 0; // Reset total spent
+      totalReturned = 0; // Reset total returned
+      tokenChart.data.labels = [];
+      tokenChart.data.datasets[0].data = [];
+      tokenChart.update();
+    });
+
+    // Simulate Swapping (4x Faster)
+    document.getElementById('startSwapping').addEventListener('click', () => {
+      console.log('Start Swapping button clicked');
+      log('Starting random swaps...');
+      swapInterval = setInterval(() => {
+        const swapAmount = Math.random() * 0.05; // Random swap amount between 0 and 0.05
+        tokenPrice += swapAmount; // Increase price based on swap amount
+        totalSpent += swapAmount; // Track total SOL spent
+        tokenChart.data.labels.push(new Date().toLocaleTimeString());
+        tokenChart.data.datasets[0].data.push(tokenPrice);
+        if (tokenChart.data.labels.length > 20) {
+          tokenChart.data.labels.shift();
+          tokenChart.data.datasets[0].data.shift();
+        }
+        tokenChart.update();
+        log(`Swap executed: +${swapAmount.toFixed(4)} SOL`);
+      }, 500); // 4x faster (every 500ms)
+    });
+
+    // Stop Swapping
+    document.getElementById('stopSwapping').addEventListener('click', () => {
+      console.log('Stop Swapping button clicked');
+      log('Stopping swaps...');
+      clearInterval(swapInterval);
+      log(`Total SOL spent during swapping: ${totalSpent.toFixed(2)} SOL`);
+    });
+
+    // Simulate Selling Tokens (Big Dump)
+    document.getElementById('sellTokens').addEventListener('click', () => {
+      console.log('Sell Tokens button clicked');
+      log('Selling all tokens...');
+      tokenPrice = 0; // Price drops to zero
+      totalReturned = totalSpent + (Math.random() * (512 - 180) + 180); // Random profit between 180 and 512 SOL
+      tokenChart.data.labels.push(new Date().toLocaleTimeString());
+      tokenChart.data.datasets[0].data.push(tokenPrice);
+      if (tokenChart.data.labels.length > 20) {
+        tokenChart.data.labels.shift();
+        tokenChart.data.datasets[0].data.shift();
+      }
+      tokenChart.update();
+      log(`Tokens sold successfully! Total SOL returned: ${totalReturned.toFixed(2)} SOL`);
+    });
+
+    // Simulate Returning SOL and Calculate Profit
+    document.getElementById('returnSol').addEventListener('click', () => {
+      const profit = totalReturned - totalSpent;
+      console.log('Return SOL button clicked');
+      log(`Returning ${totalReturned.toFixed(2)} SOL to main wallet...`);
+      log(`Total profit: ${profit.toFixed(2)} SOL`);
+      log('SOL returned successfully!');
+    });
+  </script>
+</body>
+</html>
