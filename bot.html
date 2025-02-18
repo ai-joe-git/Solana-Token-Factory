@@ -199,7 +199,7 @@
     const logOutput = document.getElementById('logOutput');
     function log(message) {
       const logEntry = document.createElement('p');
-      logEntry.textContent = `[`${{new Date().toLocaleTimeString()}]}$`{message}`;
+      logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
       logOutput.appendChild(logEntry);
       logOutput.scrollTop = logOutput.scrollHeight; // Auto-scroll to bottom
     }
@@ -239,15 +239,12 @@
       },
     });
 
-    // Simulation Variables
+    // Token Price Simulation
     let tokenPrice = 0;
-    let totalSpent = 0; // Total SOL spent during swapping
-    let totalReturned = 0; // Total SOL returned after selling tokens
     let swapInterval;
 
     // Simulate Wallet Generation
     document.getElementById('generateWallets').addEventListener('click', async () => {
-      console.log('Generate Wallets button clicked');
       log('Generating 200 wallets...');
       for (let i = 0; i <= 100; i += 5) {
         updateProgressBar(progressBars.generateWallets, i);
@@ -258,7 +255,6 @@
 
     // Simulate Funding Wallets
     document.getElementById('fundWallets').addEventListener('click', async () => {
-      console.log('Fund Wallets button clicked');
       log('Funding wallets with 0.05 SOL each...');
       for (let i = 0; i <= 100; i += 5) {
         updateProgressBar(progressBars.fundWallets, i);
@@ -270,7 +266,6 @@
     // Simulate Token Creation
     document.getElementById('createToken').addEventListener('click', async () => {
       const tokenName = document.getElementById('tokenName').value;
-      console.log('Create Token button clicked');
       log(`Creating token "${tokenName}" on pump.fun...`);
       for (let i = 0; i <= 100; i += 5) {
         updateProgressBar(progressBars.createToken, i);
@@ -278,8 +273,6 @@
       }
       log('Token created successfully!');
       tokenPrice = 0; // Reset price to zero
-      totalSpent = 0; // Reset total spent
-      totalReturned = 0; // Reset total returned
       tokenChart.data.labels = [];
       tokenChart.data.datasets[0].data = [];
       tokenChart.update();
@@ -287,12 +280,10 @@
 
     // Simulate Swapping (4x Faster)
     document.getElementById('startSwapping').addEventListener('click', () => {
-      console.log('Start Swapping button clicked');
       log('Starting random swaps...');
       swapInterval = setInterval(() => {
         const swapAmount = Math.random() * 0.05; // Random swap amount between 0 and 0.05
         tokenPrice += swapAmount; // Increase price based on swap amount
-        totalSpent += swapAmount; // Track total SOL spent
         tokenChart.data.labels.push(new Date().toLocaleTimeString());
         tokenChart.data.datasets[0].data.push(tokenPrice);
         if (tokenChart.data.labels.length > 20) {
@@ -304,20 +295,15 @@
       }, 500); // 4x faster (every 500ms)
     });
 
-    // Stop Swapping
     document.getElementById('stopSwapping').addEventListener('click', () => {
-      console.log('Stop Swapping button clicked');
       log('Stopping swaps...');
       clearInterval(swapInterval);
-      log(`Total SOL spent during swapping: ${totalSpent.toFixed(2)} SOL`);
     });
 
     // Simulate Selling Tokens (Big Dump)
     document.getElementById('sellTokens').addEventListener('click', () => {
-      console.log('Sell Tokens button clicked');
       log('Selling all tokens...');
       tokenPrice = 0; // Price drops to zero
-      totalReturned = totalSpent + (Math.random() * (512 - 180) + 180); // Random profit between 180 and 512 SOL
       tokenChart.data.labels.push(new Date().toLocaleTimeString());
       tokenChart.data.datasets[0].data.push(tokenPrice);
       if (tokenChart.data.labels.length > 20) {
@@ -325,15 +311,12 @@
         tokenChart.data.datasets[0].data.shift();
       }
       tokenChart.update();
-      log(`Tokens sold successfully! Total SOL returned: ${totalReturned.toFixed(2)} SOL`);
+      log('Tokens sold successfully! Price dropped to zero.');
     });
 
-    // Simulate Returning SOL and Calculate Profit
+    // Simulate Returning SOL
     document.getElementById('returnSol').addEventListener('click', () => {
-      const profit = totalReturned - totalSpent;
-      console.log('Return SOL button clicked');
-      log(`Returning ${totalReturned.toFixed(2)} SOL to main wallet...`);
-      log(`Total profit: ${profit.toFixed(2)} SOL`);
+      log('Returning SOL to main wallet...');
       log('SOL returned successfully!');
     });
   </script>
