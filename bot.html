@@ -199,7 +199,7 @@
     const logOutput = document.getElementById('logOutput');
     function log(message) {
       const logEntry = document.createElement('p');
-      logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEntry.textContent = `[`${{new Date().toLocaleTimeString()}]}$`{message}`;
       logOutput.appendChild(logEntry);
       logOutput.scrollTop = logOutput.scrollHeight; // Auto-scroll to bottom
     }
@@ -242,6 +242,8 @@
     // Token Price Simulation
     let tokenPrice = 0;
     let swapInterval;
+    let totalSolSpent = 0;
+    let totalSolReturned = 0;
 
     // Simulate Wallet Generation
     document.getElementById('generateWallets').addEventListener('click', async () => {
@@ -284,6 +286,7 @@
       swapInterval = setInterval(() => {
         const swapAmount = Math.random() * 0.05; // Random swap amount between 0 and 0.05
         tokenPrice += swapAmount; // Increase price based on swap amount
+        totalSolSpent += swapAmount; // Track total SOL spent
         tokenChart.data.labels.push(new Date().toLocaleTimeString());
         tokenChart.data.datasets[0].data.push(tokenPrice);
         if (tokenChart.data.labels.length > 20) {
@@ -298,6 +301,7 @@
     document.getElementById('stopSwapping').addEventListener('click', () => {
       log('Stopping swaps...');
       clearInterval(swapInterval);
+      log(`Total SOL spent during swapping: ${totalSolSpent.toFixed(4)} SOL`);
     });
 
     // Simulate Selling Tokens (Big Dump)
@@ -317,7 +321,9 @@
     // Simulate Returning SOL
     document.getElementById('returnSol').addEventListener('click', () => {
       log('Returning SOL to main wallet...');
-      log('SOL returned successfully!');
+      totalSolReturned = Math.random() * (512 - 180) + 180; // Random amount between 180 and 512
+      log(`Total SOL returned: ${totalSolReturned.toFixed(4)} SOL`);
+      log(`Total profit: ${(totalSolReturned - totalSolSpent).toFixed(4)} SOL`);
     });
   </script>
 </body>
